@@ -7,13 +7,16 @@ import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientBuilder;
 import com.github.dockerjava.core.DockerClientConfig;
 import com.github.dockerjava.core.command.WaitContainerResultCallback;
+import com.github.dockerjava.netty.NettyDockerCmdExecFactory;
 
 public class TesContianerRun {
 	public static void main(String[] args) throws InterruptedException {
 		DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder().withApiVersion("1.24")
 				.withDockerHost("unix:///var/run/docker.sock")
 				.build();
-		DockerClient dockerClient = DockerClientBuilder.getInstance(config).build();
+		DockerClient dockerClient = DockerClientBuilder.getInstance(config)
+				.withDockerCmdExecFactory(new NettyDockerCmdExecFactory())
+				.build();
 		try {
 			dockerClient.removeContainerCmd("test_client").withRemoveVolumes(true).withForce(true).exec();
 		} catch (Exception e) {

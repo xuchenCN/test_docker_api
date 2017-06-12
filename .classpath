@@ -6,6 +6,23 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="src" output="target/classes" path="src/main/grpc-gen">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry excluding="**" kind="src" output="target/classes" path="src/main/proto">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" path="src/main/python"/>
+	<classpathentry excluding="**" kind="src" output="target/classes" path="src/main/resources">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="src" output="target/test-classes" path="src/test/java">
 		<attributes>
 			<attribute name="optional" value="true"/>
@@ -22,12 +39,5 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="src/main/dependencies/pty4j-0.7.2.jar" sourcepath="src/main/dependencies/pty4j-0.7.2-src.jar"/>
-	<classpathentry kind="lib" path="src/main/dependencies/guava-14.0.1.jar"/>
-	<classpathentry kind="lib" path="src/main/dependencies/jna-platform.jar"/>
-	<classpathentry kind="lib" path="src/main/dependencies/jna.jar"/>
-	<classpathentry kind="lib" path="src/main/dependencies/junit-4.10.jar"/>
-	<classpathentry kind="lib" path="src/main/dependencies/log4j-1.2.14.jar"/>
-	<classpathentry kind="lib" path="src/main/dependencies/purejavacomm-0.0.17.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

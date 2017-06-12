@@ -1,6 +1,8 @@
 package docker_client_test.docker_client_test;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.ExecCreateCmdResponse;
@@ -50,6 +52,5 @@ public class TesContianerExec {
 				}
 			}
 		}).start();
-		
 	}
 }

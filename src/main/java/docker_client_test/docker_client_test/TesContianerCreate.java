@@ -163,7 +163,7 @@ class ExecStartTestCallback extends ResultCallbackTemplate<ExecStartResultCallba
 				case STDOUT:
 					System.out.println("stdout : " + new String(frame.getPayload()));
 				case RAW:
-					System.out.println("raw : " + new String(frame.getPayload()));
+//					System.out.println("raw : " + new String(frame.getPayload()));
 					break;
 				case STDERR:
 					System.out.println("stderr : " + new String(frame.getPayload()));
@@ -175,7 +175,7 @@ class ExecStartTestCallback extends ResultCallbackTemplate<ExecStartResultCallba
 				onError(e);
 			}
 
-			 System.out.println(frame.toString());
+//			 System.out.println(frame.toString());
 		}
 	}
 }

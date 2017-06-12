@@ -13,9 +13,27 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<netty.version>4.1.11.Final</netty.version>
+		<grpc.version>1.4.0</grpc.version>
+		<protobuf.version>3.0.0-beta-3</protobuf.version>
 	</properties>
-
 	<build>
+
+		<sourceDirectory>src/main/java</sourceDirectory>
+		<testSourceDirectory>src/test/java</testSourceDirectory>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+			<resource>
+				<directory>src/main/proto</directory>
+			</resource>
+		</resources>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+			</testResource>
+		</testResources>
+
 		<extensions>
 			<extension>
 				<groupId>kr.motd.maven</groupId>
@@ -23,15 +41,74 @@
 				<version>1.5.0.Final</version>
 			</extension>
 		</extensions>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.12</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>src/main/grpc-gen</source>
+								<source>src/main/proto-gen</source>
+								<source>src/main/proto</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.xolstice.maven.plugins</groupId>
+				<artifactId>protobuf-maven-plugin</artifactId>
+				<version>0.5.0</version>
+				<configuration>
+					<!-- The version of protoc must match protobuf-java. If you don't depend 
+						on protobuf-java directly, you will be transitively depending on the protobuf-java 
+						version that grpc depends on. -->
+					<protocArtifact>com.google.protobuf:protoc:3.0.0-beta-3:exe:${os.detected.classifier}
+					</protocArtifact>
+					<pluginId>grpc-java</pluginId>
+					<pluginArtifact>io.grpc:protoc-gen-grpc-java:0.14.1:exe:${os.detected.classifier}</pluginArtifact>
+					<!-- <protocExecutable>${basedir}/protoc/osx/protoc</protocExecutable> -->
+					<clearOutputDirectory>false</clearOutputDirectory>
+					<outputDirectory>${basedir}/src/main/grpc-gen</outputDirectory>
+					<protoSourceRoot>${basedir}/src/main/proto/</protoSourceRoot>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>compile</goal>
+							<goal>compile-custom</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.0.2</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+						</manifest>
+					</archive>
+
+				</configuration>
+			</plugin>
+		</plugins>
+
 	</build>
 
-	<dependencies>
 
-		<dependency>
-			<groupId>com.github.docker-java</groupId>
-			<artifactId>docker-java</artifactId>
-			<version>3.0.10</version>
-		</dependency>
+	<dependencies>
 
 		<dependency>
 			<groupId>com.sun.jna</groupId>
@@ -39,5 +116,38 @@
 			<version>3.0.9</version>
 		</dependency>
 
+
+		<dependency>
+			<groupId>com.google.protobuf</groupId>
+			<artifactId>protobuf-java</artifactId>
+			<version>${protobuf.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.grpc</groupId>
+			<artifactId>grpc-netty</artifactId>
+			<version>${grpc.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.grpc</groupId>
+			<artifactId>grpc-protobuf</artifactId>
+			<version>${grpc.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.grpc</groupId>
+			<artifactId>grpc-stub</artifactId>
+			<version>${grpc.version}</version>
+		</dependency>
+	<!-- 	<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>19.0</version>
+		</dependency>
+		 -->
+		<dependency>
+			<groupId>com.lenovo.docker-java</groupId>
+			<artifactId>docker-java</artifactId>
+			<version>3.0.6-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 </project>

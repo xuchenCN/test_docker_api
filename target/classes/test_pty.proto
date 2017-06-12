@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option java_package = "com.lenovo.husky.docker";
+option java_outer_classname = "TestPTYProtocol";
+option java_generic_services = true;
+option java_generate_equals_and_hash = true;
+
+message CmdRequest {
+	bytes body = 1;
+}
+
+message CmdResponse {
+	bytes body = 1;
+}
+
+service PTYService {
+	rpc command (CmdRequest) returns (stream CmdResponse) ;
+}
