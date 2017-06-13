@@ -114,7 +114,7 @@ class Terminal(object):
 
         If the raw terminal was not started, does nothing.
         """
-        print("tty stop" )
+#         print("tty stop" )
         if self.original_attributes is not None:
             termios.tcsetattr(
                 self.fd,

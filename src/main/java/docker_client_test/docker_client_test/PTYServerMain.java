@@ -51,6 +51,8 @@ class PTYService extends AbstractPTYService {
 	InputStream remoteIn;
 	OutputStream remoteOut;
 	byte[] buf = new byte[1024];
+	
+	StreamObserver<CmdResponse> oneWriter;
 
 	public PTYService(InputStream remoteIn, OutputStream remoteOut) {
 		this.remoteIn = remoteIn;
@@ -67,19 +69,32 @@ class PTYService extends AbstractPTYService {
 				remoteOut.write(body.toByteArray());
 			}
 //			int read;
-			while (remoteIn.read(buf) != -1) {
-				CmdResponse resp = CmdResponse.newBuilder().setBody(ByteString.copyFrom(buf)).build();
-				responseObserver.onNext(resp);
-				System.out.println("on next " + resp);
+			if(oneWriter == null) {
+				oneWriter = responseObserver;
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							while (remoteIn.read(buf) != -1) {
+								CmdResponse resp = CmdResponse.newBuilder().setBody(ByteString.copyFrom(buf)).build();
+								responseObserver.onNext(resp);
+								System.out.println("on next " + resp);
+							}
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}).start();
+			} else {
+				System.out.println("grpc command completed");
+				responseObserver.onCompleted();
 			}
-
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		System.out.println("grpc command completed");
-		responseObserver.onCompleted();
+		
 	}
 
 }
@@ -103,71 +118,4 @@ class CmdObserver implements StreamObserver<CmdResponse> {
 		System.out.println("onCompleted : ");
 	}
 
-}
-
-class StartExec {
-
-	public void start(InputStream attachIn, OutputStream attachOut) {
-
-		DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder().withApiVersion("1.24")
-				.withDockerHost("unix:///var/run/docker.sock").build();
-		DockerClient dockerClient = DockerClientBuilder.getInstance(config)
-				.withDockerCmdExecFactory(new NettyDockerCmdExecFactory()).build();
-
-		ExecCreateCmdResponse interactiveCmd = dockerClient.execCreateCmd("test_client").withAttachStderr(true)
-				.withAttachStdin(true).withAttachStdout(true).withTty(true).withCmd("/bin/bash").exec();
-
-		// InputStream stdin = new ByteArrayInputStream("echo
-		// STDIN\n".getBytes());
-
-		new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-				try {
-					dockerClient.execStartCmd(interactiveCmd.getId()).withStdIn(attachIn).exec(new ExecStartStream(attachOut))
-							.awaitCompletion();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}).start();
-	}
-
-}
-
-class ExecStartStream extends ResultCallbackTemplate<ExecStartResultCallback, Frame> {
-
-	OutputStream out;
-
-	public ExecStartStream(OutputStream out) {
-		this.out = out;
-	}
-
-	@Override
-	public void onNext(Frame frame) {
-		if (frame != null) {
-			try {
-				switch (frame.getStreamType()) {
-				case STDOUT:
-					// System.out.println("stdout : " + new
-					// String(frame.getPayload()));
-				case RAW:
-					System.out.println("raw : " + new String(frame.getPayload()));
-					out.write(frame.getPayload());
-					break;
-				case STDERR:
-					System.out.println("stderr : " + new String(frame.getPayload()));
-					break;
-				default:
-					System.out.println("unknown stream type:" + frame.getStreamType());
-				}
-			} catch (Exception e) {
-				onError(e);
-			}
-
-			// System.out.println(frame.toString());
-		}
-	}
 }
